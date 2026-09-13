@@ -1,6 +1,6 @@
 import json
 
-from fastapi import FastAPI  # pyright: ignore[reportMissingImports]
+from fastapi import FastAPI, Path  # pyright: ignore[reportMissingImports]
 
 app = FastAPI()
 
@@ -24,7 +24,7 @@ def view_data():
     return data
 
 @app.get("/view/{patient_id}")
-def view_patient(patient_id):
+def view_patient(patient_id: str = Path(...,description='ID of the patient in the DB', example = 'P001')):
     data = load_data()
     if patient_id in data:
         return data[patient_id]
