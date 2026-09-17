@@ -48,5 +48,15 @@
     "weight": 75,
     "bmi": 31.22,
     "verdict": "Obese"
+  },
+  "P006": {
+    "name": "Katie",
+    "city": "Hyderabad",
+    "age": 46,
+    "gender": "Female",
+    "height": 1.65,
+    "weight": 53.0,
+    "bmi": 53.0,
+    "verdict": "Obese"
   }
 }
