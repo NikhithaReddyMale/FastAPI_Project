@@ -45,6 +45,25 @@ class Patient(BaseModel):
             return "Obese"
 
 
+class PatientUpdate(BaseModel):
+    name: Annotated[
+        Optional[str], Field(default=None, description="Name of the patient")
+    ]
+    city: Annotated[
+        Optional[str],
+        Field(default="Hyderabad", description="Patient is from which city"),
+    ]
+    age: Annotated[Optional[int], Field(default=None, description="Age of the patient")]
+    gender: Annotated[
+        Optional[Literal["Male", "Female", "Others"]],
+        Field(default=None, description="Gender of the patient"),
+    ]
+    height: Annotated[
+        Optional[float], Field(default=None, description="Height in mtrs")
+    ]
+    weight: Annotated[Optional[float], Field(default=None, description="Weight in kgs")]
+
+
 app = FastAPI()
 
 
@@ -129,3 +148,42 @@ def create_patient(patient: Patient):
     return JSONResponse(
         status_code=201, content={"message": "Patient record created successfully"}
     )
+
+
+@app.put("/edit/{patient_id}")
+def update_patient_data(patient_id: str, patient_data: PatientUpdate):
+    data = load_data()
+    if patient_id not in data:
+        raise HTTPException(
+            status_code=400, detail=f"Patient {patient_id} not found"
+        )
+
+    existing_patient_data = data[patient_id]
+
+    current_patient_data = patient_data.model_dump(exclude_unset=True)
+
+    for key, value in current_patient_data.items():
+        existing_patient_data[key] = value
+
+    existing_patient_data["id"] = patient_id
+
+    patient_obj = Patient(**existing_patient_data)
+
+    patient_obj_dict = patient_obj.model_dump(exclude='id')
+
+    data[patient_id] = patient_obj_dict
+
+    write_data(data)
+    return JSONResponse(
+        status_code=200, content={"message": "Patient updated successfully"}
+    )
+
+
+@app.delete('/delete/{patient)id}')
+def delete_patient(patient_id: str):
+    data = load_data()
+    if patient_id not in data:
+        raise HTTPException(status_code=40, detail = f'{patient_id} doesn\'t exist')
+    del data[patient_id]
+    write_data(data)
+    return JSONResponse(status_code=200, content={'message': 'Deleted'})
